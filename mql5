@@ -1,0 +1,106 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                             Dagangduit Daily Drawdown MT5|
+//|                                                  forexroboteasy.com |
+//|                                               Forex Robot Easy Team |
+//|------------------------------------------------------------------|
+//|                                                                  |
+//| Terms of Reference:                                               |
+//| 1. Develop code to enable daily monitoring of drawdown in the     |
+//|    Dagangduit MT5 platform.                                        |
+//| 2. The code should automatically compute and display the daily     |
+//|    drawdown on the trading chart.                                  |
+//| 3. Ensure that the code provides a clear and accurate picture of   |
+//|    the daily trading performance.                                  |
+//| 4. Implement risk management features to effectively manage risk   |
+//|    in Forex trading.                                               |
+//| 5. Enable daily drawdown monitoring to help traders manage risk    |
+//|    proficiently.                                                   |
+//| 6. The code should help traders keep losses within acceptable       |
+//|    bounds by monitoring daily fluctuations.                        |
+//| 7. Provide real-time forex market analysis through the code.       |
+//| 8. Ensure that the code is continually updated in real time to     |
+//|    offer accurate and up-to-date information.                      |
+//| 9. The code should aid in making well-informed trading decisions.  |
+//| 10. Implement necessary trading functions to support the algorithm.|
+//| 11. The code should only include the required features and         |
+//|    functions for trading.                                          |
+//| 12. The technical specification should specify the necessary       |
+//|     trading functions for the algorithm.                           |
+//| 13. The terms of reference should not include any additional text  |
+//|     or requirements.                                               |
+//| 14. The size of the terms of reference should be no more than      |
+//|     1500-2000 characters.                                          |
+//|                                                                  |
+//+------------------------------------------------------------------+
+
+// Define necessary input parameters for the trading algorithm
+input double RiskPercentage = 1.0; // Risk percentage per trade
+
+// Define global variables
+double previousEquity = 0.0;
+double maxDrawdown = 0.0;
+datetime previousTime = 0;
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Set up chart properties
+    ChartSetInteger(0, CHART_SCALE, SCALE_LOGARITHMIC);
+    ChartSetInteger(0, CHART_AUTOSCROLL, true);
+    ChartSetInteger(0, CHART_SHOW_OBJECT_DESCR, false);
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator deinitialization function                       |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Perform cleanup tasks
+    // ...
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime& time[],
+                const double& open[],
+                const double& high[],
+                const double& low[],
+                const double& close[],
+                const long& tick_volume[],
+                const long& volume[],
+                const int& spread[])
+{
+    // Calculate current equity
+    double currentEquity = AccountEquity();
+
+    // Calculate drawdown
+    double drawdown = previousEquity - currentEquity;
+
+    // Update maximum drawdown
+    if (drawdown > maxDrawdown)
+        maxDrawdown = drawdown;
+
+    // Calculate daily drawdown
+    if (TimeDay(previousTime) != TimeDay(time[0]))
+    {
+        Alert('Daily drawdown: ', DoubleToString(maxDrawdown, 2), '%');
+        maxDrawdown = 0.0;
+    }
+
+    // Update previous equity and time
+    previousEquity = currentEquity;
+    previousTime = time[0];
+
+    // Perform trading algorithm
+    // ...
+
+    return(rates_total);
+}
